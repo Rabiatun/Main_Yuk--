@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
             'name'     => 'Administrator',
             'email'    => 'admin@sportcenter.com',
             'password' => Hash::make('password'),
-            'role'     => 'admin',
+            'role'     => 'super_admin',
         ]);
 
         Setting::create([

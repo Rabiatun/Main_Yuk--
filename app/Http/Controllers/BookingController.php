@@ -6,14 +6,31 @@ use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Field;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class BookingController extends Controller
 {
+    // RAW SQL — mengambil daftar booking dengan JOIN
     public function index()
     {
-        $bookings = Booking::with(['customer', 'field'])
-            ->orderByDesc('booking_date')
-            ->paginate(10);
+        $perPage = 10;
+        $page    = request()->get('page', 1);
+        $offset  = ($page - 1) * $perPage;
+
+        $items = DB::select("
+            SELECT b.*, c.name AS customer_name, f.name AS field_name
+            FROM bookings b
+            JOIN customers c ON b.customer_id = c.id
+            JOIN fields f ON b.field_id = f.id
+            ORDER BY b.booking_date DESC
+            LIMIT ? OFFSET ?
+        ", [$perPage, $offset]);
+
+        $total    = DB::select("SELECT COUNT(*) AS total FROM bookings")[0]->total;
+        $bookings = new LengthAwarePaginator($items, $total, $perPage, $page, [
+            'path' => request()->url(),
+        ]);
 
         return view('bookings.index', compact('bookings'));
     }
@@ -25,6 +42,7 @@ class BookingController extends Controller
         return view('bookings.create', compact('customers', 'fields'));
     }
 
+    // ELOQUENT — store dengan conflict check
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -36,7 +54,6 @@ class BookingController extends Controller
             'notes'        => 'nullable|string',
         ]);
 
-        // Cek ketersediaan lapangan (tidak bentrok)
         $conflict = Booking::where('field_id', $data['field_id'])
             ->where('booking_date', $data['booking_date'])
             ->where('status', '!=', 'cancelled')
@@ -53,11 +70,9 @@ class BookingController extends Controller
             return back()->withInput()->with('error', 'Lapangan sudah dibooking pada jam tersebut. Pilih jam lain.');
         }
 
-        $field          = Field::findOrFail($data['field_id']);
-        $start          = strtotime($data['start_time']);
-        $end            = strtotime($data['end_time']);
-        $durationHours  = ($end - $start) / 3600;
-        $totalPrice     = $durationHours * $field->price_per_hour;
+        $field         = Field::findOrFail($data['field_id']);
+        $durationHours = (strtotime($data['end_time']) - strtotime($data['start_time'])) / 3600;
+        $totalPrice    = $durationHours * $field->price_per_hour;
 
         Booking::create(array_merge($data, [
             'duration_hours' => $durationHours,
@@ -69,29 +84,55 @@ class BookingController extends Controller
         return redirect()->route('bookings.index')->with('success', 'Booking berhasil dibuat.');
     }
 
-    public function show(Booking $booking)
+    // QUERY BUILDER — ambil detail booking dengan join
+    public function show($id)
     {
-        $booking->load(['customer', 'field']);
+        $booking = DB::table('bookings')
+            ->join('customers', 'bookings.customer_id', '=', 'customers.id')
+            ->join('fields', 'bookings.field_id', '=', 'fields.id')
+            ->select(
+                'bookings.*',
+                'customers.name AS customer_name',
+                'fields.name AS field_name'
+            )
+            ->where('bookings.id', $id)
+            ->first();
+
+        if (!$booking) abort(404);
+
         return view('bookings.show', compact('booking'));
     }
 
-    public function updatePayment(Request $request, Booking $booking)
+    // QUERY BUILDER — update status pembayaran
+    public function updatePayment(Request $request, $id)
     {
         $request->validate(['payment_status' => 'required|in:unpaid,paid']);
-        $booking->update(['payment_status' => $request->payment_status]);
+
+        DB::table('bookings')->where('id', $id)->update([
+            'payment_status' => $request->payment_status,
+            'updated_at'     => now(),
+        ]);
+
         return back()->with('success', 'Status pembayaran diperbarui.');
     }
 
-    public function updateStatus(Request $request, Booking $booking)
+    // QUERY BUILDER — update status booking
+    public function updateStatus(Request $request, $id)
     {
         $request->validate(['status' => 'required|in:pending,confirmed,cancelled']);
-        $booking->update(['status' => $request->status]);
+
+        DB::table('bookings')->where('id', $id)->update([
+            'status'     => $request->status,
+            'updated_at' => now(),
+        ]);
+
         return back()->with('success', 'Status booking diperbarui.');
     }
 
-    public function destroy(Booking $booking)
+    // RAW SQL — hapus booking
+    public function destroy($id)
     {
-        $booking->delete();
+        DB::delete("DELETE FROM bookings WHERE id = ?", [$id]);
         return redirect()->route('bookings.index')->with('success', 'Booking berhasil dihapus.');
     }
 

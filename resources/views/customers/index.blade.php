@@ -36,7 +36,7 @@
                         <a href="{{ route('customers.edit', $customer) }}"
                            class="text-blue-600 dark:text-blue-400 hover:underline text-xs">Edit</a>
                         <form method="POST" action="{{ route('customers.destroy', $customer) }}"
-                              onsubmit="return confirm('Hapus pelanggan ini?')">
+                              onsubmit="confirmDelete(this, 'Pelanggan ini akan dihapus permanen.'); return false;">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-red-600 dark:text-red-400 hover:underline text-xs">Hapus</button>
                         </form>

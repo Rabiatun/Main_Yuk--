@@ -55,7 +55,7 @@
                             <a href="{{ route('bookings.show', $booking) }}"
                                class="text-green-600 dark:text-green-400 hover:underline text-xs">Detail</a>
                             <form method="POST" action="{{ route('bookings.destroy', $booking) }}"
-                                  onsubmit="return confirm('Hapus booking ini?')">
+                                  onsubmit="confirmDelete(this, 'Booking ini akan dihapus permanen.'); return false;">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="text-red-600 dark:text-red-400 hover:underline text-xs">Hapus</button>
                             </form>

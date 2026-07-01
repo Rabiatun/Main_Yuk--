@@ -9,8 +9,8 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || !auth()->user()->isAdmin()) {
-            abort(403, 'Akses ditolak.');
+        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
+            return response(view('errors.403'), 403);
         }
 
         return $next($request);
