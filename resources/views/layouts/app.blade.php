@@ -84,57 +84,7 @@
             <p class="text-sm font-medium truncate">{{ auth()->user()->name }}</p>
             <p class="text-xs text-green-300 dark:text-gray-400 capitalize">{{ auth()->user()->role }}</p>
             <form method="POST" action="{{ route('logout') }}" class="mt-2">
-                @csrfJudul Presentasi
-                Sport Center Booking System Implementasi Konsep Dasar Laravel — Route, Controller, Request, Response, Cookie & Session
-                
-                Slide 1: Judul
-                Sport Center Booking System
-                Dibangun dengan Laravel 12 + Tailwind CSS
-                Nama Kamu | Nama Universitas/Kelas
-                Slide 2: Agenda
-                Pengenalan Proyek
-                Setup & Konfigurasi
-                Arsitektur: Route & Controller
-                Interaksi User: Request & Response
-                Manajemen State: Cookie & Session
-                Live DemoJudul Presentasi
-                Sport Center Booking System Implementasi Konsep Dasar Laravel — Route, Controller, Request, Response, Cookie & Session
-                
-                Slide 1: Judul
-                Sport Center Booking System
-                Dibangun dengan Laravel 12 + Tailwind CSS
-                Nama Kamu | Nama Universitas/Kelas
-                Slide 2: Agenda
-                Pengenalan Proyek
-                Setup & Konfigurasi
-                Arsitektur: Route & Controller
-                Interaksi User: Request & Response
-                Manajemen State: Cookie & Session
-                Live Demo
-                Tanya Jawab
-                Slide 3: Latar Belakang
-                "Proyek ini adalah sistem pemesanan lapangan olahraga berbasis web. Pengelola sport center sering kesulitan mencatat booking secara manual — bentrok jadwal, pembayaran tidak tercatat, dan tidak ada rekap pendapatan."
-                
-                Solusi: Aplikasi web yang bisa mengelola booking lapangan Futsal, Badminton, dan Voli secara real-time, lengkap dengan manajemen pelanggan, user, dan laporan pendapatan.
-                
-                Slide 4: Kenapa Laravel?
-                MVC — Memisahkan logika (Controller), data (Model), dan tampilan (View/Blade)
-                Routing terpusat — Semua URL diatur di routes/web.php
-                Blade Templating — Reuse layout dengan @extends dan @yield
-                Keamanan bawaan — CSRF protection, password hashing, middleware auth
-                Eloquent ORM — Query database tanpa tulis SQL manual
-                Tanya Jawab
-                Slide 3: Latar Belakang
-                "Proyek ini adalah sistem pemesanan lapangan olahraga berbasis web. Pengelola sport center sering kesulitan mencatat booking secara manual — bentrok jadwal, pembayaran tidak tercatat, dan tidak ada rekap pendapatan."
-                
-                Solusi: Aplikasi web yang bisa mengelola booking lapangan Futsal, Badminton, dan Voli secara real-time, lengkap dengan manajemen pelanggan, user, dan laporan pendapatan.
-                
-                Slide 4: Kenapa Laravel?
-                MVC — Memisahkan logika (Controller), data (Model), dan tampilan (View/Blade)
-                Routing terpusat — Semua URL diatur di routes/web.php
-                Blade Templating — Reuse layout dengan @extends dan @yield
-                Keamanan bawaan — CSRF protection, password hashing, middleware auth
-                Eloquent ORM — Query database tanpa tulis SQL manual
+                @csrf
                 <button type="submit" class="text-xs text-green-300 dark:text-gray-400 hover:text-white">Logout →</button>
             </form>
         </div>
